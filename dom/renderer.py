@@ -5,6 +5,9 @@ class DOM(object):
     """
     Used to represent a node in an HTML document object model
     """
+    element: str
+    children: list['DOM']
+    text: str
 
     def __init__(self: 'DOM', element: str, *, children: list['DOM']=[], text: str=""):
         self.element: str = element
