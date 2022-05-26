@@ -32,13 +32,15 @@ class BlockTokenizer(object):
         
         return matched.group(0)
 
-    def get_next_token(self) -> dict[str, str] | None:
+    def get_next_token(self) -> dict[str, str]:
         # get the next line from the stream
         next_line: str = self._stream.readline()
 
         # if there are no more lines in the stream return none
         if next_line == "":
-            return
+            return {
+                "type": "EOF"
+            }
 
         # try to match with each pattern in block_spec
         for pattern in block_spec:
