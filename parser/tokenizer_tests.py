@@ -21,10 +21,10 @@ class BlockTokenizerTests(TestCase):
             self.fail("Can only run test with 'block' or 'inline' tokenizer")
         
         for i in range(0, len(expected)):
-            self.assertEquals(expected[i], tokenizer.get_next_token())
+            self.assertEqual(expected[i], tokenizer.get_next_token())
 
         # assert there are no more tokens left
-        self.assertEquals(None, tokenizer.get_next_token())
+        self.assertEqual(None, tokenizer.get_next_token())
 
 
     def test_blank_line(self):
