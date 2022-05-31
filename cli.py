@@ -34,4 +34,9 @@ def parse_args(args: list[str]) -> Namespace:
             action="store_true"
             )
 
+    parser.add_argument("--output", "-o",
+            help="File to output the html to",
+            type=str,
+            default="output.html")
+
     return parser.parse_args(args)
