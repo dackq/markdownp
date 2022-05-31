@@ -1,17 +1,19 @@
 """
 Renderer for html files from DOM objects
 """
+
+from typing import Union
+
 class DOM(object):
     """
     Used to represent a node in an HTML document object model
     """
     element: str
-    children: list['DOM' | str]
-    text: str
+    children: list[Union['DOM', str]]
 
-    def __init__(self: 'DOM', element: str, *, children: list['DOM' | str]=[]):
+    def __init__(self: 'DOM', element: str, *, children: list[Union['DOM', str]]=[]):
         self.element: str = element
-        self.children: list[DOM | str] = children
+        self.children: list[Union[DOM, str]] = children
 
     def __str__(self):
         return _build_node(self)
