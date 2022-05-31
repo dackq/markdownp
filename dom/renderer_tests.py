@@ -1,14 +1,13 @@
 import unittest
 
-from dom.renderer import DOM, render
+from renderer import DOM, render
 
 class Tests(unittest.TestCase):
     def setup(self):
         pass
     
     def test_paragraph(self):
-        text: DOM = DOM("text", text="Hello there")
-        paragraph: DOM = DOM("p", children=[text])
+        paragraph: DOM = DOM("p", children=["Hello there"])
 
         html = render(paragraph)
 
@@ -17,8 +16,7 @@ class Tests(unittest.TestCase):
         self.assertEquals(html, expected)
 
     def test_html_object(self):
-        text: DOM = DOM("text", text="Hello there")
-        paragraph: DOM = DOM("p", children=[text])
+        paragraph: DOM = DOM("p", children=["Hello there"])
         html: DOM = DOM("html", children=[paragraph, paragraph])
 
         actual = render(html)
