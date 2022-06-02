@@ -24,7 +24,7 @@ class BlockTokenizerTests(TestCase):
             self.assertEqual(expected[i], tokenizer.get_next_token())
 
         # assert there are no more tokens left
-        self.assertEqual(None, tokenizer.get_next_token())
+        self.assertEqual('EOF', tokenizer.get_next_token()["type"])
 
 
     def test_blank_line(self):
