@@ -54,6 +54,15 @@ class BlockTokenizerTests(TestCase):
         )
         self.run_test(text, expected, tokenizer_type='block')
 
+    def test_indent(self):
+        text: str = "    indented line"
+        expected: tuple[dict[str, str], ...] = (
+                {"type": "INDENT"},
+                {"type": "TEXT_LINE", "value": "indented line"}
+        )
+        self.run_test(text, expected, tokenizer_type='block')
+
+
     def test_text_line(self):
         text: str = "hello there"
         expected: tuple[dict[str, str], ...] = (
@@ -104,6 +113,14 @@ class BlockTokenizerTests(TestCase):
                 {"type": "TEXT_LINE", "value": "another line"},
                 {"type": "BLANK_LINE"},
         )
+        self.run_test(text, expected, tokenizer_type='block')
+
+        text: str = "this is a line\n\tthis is indented"
+        expected: tuple[dict[str, str], ...] = (
+                {"type": "TEXT_LINE", "value": "this is a line"},
+                {"type": "INDENT"},
+                {"type": "TEXT_LINE", "value": "this is indented"},
+                )
         self.run_test(text, expected, tokenizer_type='block')
         
 
