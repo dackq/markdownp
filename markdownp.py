@@ -1,4 +1,3 @@
-#! /usr/bin/python3.10
 """
 A simple command line program that parses markdown text into html.
 """
