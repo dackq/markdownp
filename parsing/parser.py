@@ -66,9 +66,26 @@ class BlockParser(object):
             return
         if self._lookahead["type"] == "ATX_HEADER":
             return self._atx_header()
+        if self._lookahead["type"] == "INDENT_LINE":
+            return self._code_block()
 
         # otherwise treat as a paragraph
         return self._paragraph()
+
+    def _code_block(self) -> DOM:
+        """
+        CodeBlock
+            : INDENT_LINE CodeBlock
+            | INDENT_LINE
+            | None
+            ;
+        """
+        contents: str = self._eat("INDENT_LINE")["value"].strip()
+
+        while self._lookahead["type"] == "INDENT_LINE":
+            contents += f"\n{self._eat('INDENT_LINE')['value'].strip()}"
+
+        return DOM('pre', children=[DOM('code', children=[contents])])
 
     def _atx_header(self) -> DOM:
         """

@@ -75,6 +75,16 @@ this is a paragraph followed by a header
         expected: str = "<html><p>this is a paragraph followed by a header</p><h2>header number 2</h2></html>"
         self.run_test(markdown, expected)
 
+    def test_code_block(self):
+        markdown: str = """
+    this is a code block
+    this is another part of code 
+    x = a + b
+This is a paragraph
+        """
+        expected: str = "<html><pre><code>this is a code block\nthis is another part of code\nx = a + b</code></pre><p>This is a paragraph</p></html>"
+        self.run_test(markdown, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
