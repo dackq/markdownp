@@ -9,10 +9,17 @@ block_spec: tuple[tuple[str, str], ...] = (
     ('[ \\t]*', 'BLANK_LINE'),
 
     # indented lines
-    ('(?:    +|\t).*', 'INDENT_LINE'),
+    ('(?: {4,}|\t).*', 'INDENT_LINE'),
+
+    # list lines
+    # unordered
+    (' *[-*] .*', 'UL_LINE'),
+
+    # ordered
+    (' *\\d+\\. .*', 'OL_LINE'),
 
     # headers
-    (' {0,3}(#{1,6} .+)', 'ATX_HEADER'),
+    (' *(#{1,6} .+)', 'ATX_HEADER'),
 )
 
 class BlockTokenizer(object):
