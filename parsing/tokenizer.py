@@ -8,7 +8,6 @@ block_spec: tuple[tuple[str, str], ...] = (
     # indent
     ('( {4}|\\t)', 'INDENT'),
 
-
     # list lines
     # unordered
     (' *[-*] .*', 'UL_LINE'),
@@ -23,8 +22,7 @@ block_spec: tuple[tuple[str, str], ...] = (
 class BlockTokenizer(object):
     """
     Lazily returns token based on the block structures of a markdown 
-    document. Each token is equivalent to an entire line in the 
-    markdown file.
+    document.
     """
     def __init__(self, stream: TextIOBase):
         self._stream: TextIOBase = stream
