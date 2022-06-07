@@ -40,6 +40,19 @@ class BlockTokenizer(object):
 
         return matched.group(1)
 
+    def get_rest_of_line(self) -> str:
+        """
+        Returns the rest of the line as a string without trying to analyze any
+        tokens.
+
+        This is used when a specific structure ignores the token value of a line 
+        and just returns a string of plane text. (For example, in a code block)
+        """
+        line: str = self._current_line[self._cursor:]
+        self._cursor = len(self._current_line)
+        return line
+
+
     def get_next_token(self) -> dict[str, str]:
         """
         Grab the next token off the stream
