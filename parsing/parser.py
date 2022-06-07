@@ -133,7 +133,7 @@ class BlockParser(object):
         """
         Paragraph
             : TEXT_LINE Paragraph
-            | INDENT_LINE Paragraph
+            | ParagraphContinuationLine
             | None
             ;
         """
@@ -141,13 +141,26 @@ class BlockParser(object):
 
         while (
             self._lookahead["type"] == "TEXT_LINE" 
-            or self._lookahead["type"] == "INDENT_LINE"
+            or self._lookahead["type"] == "INDENT"
                 ):
             # we append the stripped contents of this line to the paragraph
             # contents and consume the token
-            contents += f"\n{self._eat(self._lookahead['type'])['value'].strip()}"
+            contents += f"\n{self._p_continuation_line().strip()}"
 
         return DOM('p', children=[contents])
+
+    def _p_continuation_line(self) -> str:
+        """
+        ParagraphContinuationLine
+            : TEXT_LINE
+            | IndentLine
+            ;
+        """
+        if self._lookahead["type"] == "TEXT_LINE":
+            return self._eat("TEXT_LINE")["value"]
+        else:
+            return self._indent_line()
+        
 
 class InlineParser(object):
     def parse(self, dom: DOM):
