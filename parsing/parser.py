@@ -34,6 +34,16 @@ class BlockParser(object):
         raise SyntaxError(f"Received unexpected line {self._lookahead}, "
                 f"expected {expected_type}")
 
+    def _eat_rest_of_line(self) -> str:
+        """
+        Consume entire stream until the next '\\n' character.
+
+        Used when token values for a line should be ignored.
+        """
+        # the line is the current token + any remaining text in the line
+        line: str = self._lookahead["value"] + self._tokenizer.get_rest_of_line()
+        self._lookahead = self._tokenizer.get_next_token()
+        return line
     
     def _html(self) -> DOM:
         return DOM('html', children=self._element_list())
