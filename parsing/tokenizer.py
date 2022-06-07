@@ -8,7 +8,6 @@ block_spec: tuple[tuple[str, str], ...] = (
     # indent
     ('( {4}|\\t)', 'INDENT'),
 
-
     # list lines
     # unordered
     (' *[-*] .*', 'UL_LINE'),
@@ -23,8 +22,7 @@ block_spec: tuple[tuple[str, str], ...] = (
 class BlockTokenizer(object):
     """
     Lazily returns token based on the block structures of a markdown 
-    document. Each token is equivalent to an entire line in the 
-    markdown file.
+    document.
     """
     def __init__(self, stream: TextIOBase):
         self._stream: TextIOBase = stream
@@ -41,6 +39,19 @@ class BlockTokenizer(object):
         self._cursor = len(matched.group())
 
         return matched.group(1)
+
+    def get_rest_of_line(self) -> str:
+        """
+        Returns the rest of the line as a string without trying to analyze any
+        tokens.
+
+        This is used when a specific structure ignores the token value of a line 
+        and just returns a string of plane text. (For example, in a code block)
+        """
+        line: str = self._current_line[self._cursor:]
+        self._cursor = len(self._current_line)
+        return line
+
 
     def get_next_token(self) -> dict[str, str]:
         """

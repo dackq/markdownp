@@ -34,6 +34,16 @@ class BlockParser(object):
         raise SyntaxError(f"Received unexpected line {self._lookahead}, "
                 f"expected {expected_type}")
 
+    def _eat_rest_of_line(self) -> str:
+        """
+        Consume entire stream until the next '\\n' character.
+
+        Used when token values for a line should be ignored.
+        """
+        # the line is the current token + any remaining text in the line
+        line: str = self._lookahead["value"] + self._tokenizer.get_rest_of_line()
+        self._lookahead = self._tokenizer.get_next_token()
+        return line
     
     def _html(self) -> DOM:
         return DOM('html', children=self._element_list())
@@ -66,7 +76,7 @@ class BlockParser(object):
             return
         if self._lookahead["type"] == "ATX_HEADER":
             return self._atx_header()
-        if self._lookahead["type"] == "INDENT_LINE":
+        if self._lookahead["type"] == "INDENT":
             return self._code_block()
 
         # otherwise treat as a paragraph
@@ -75,17 +85,26 @@ class BlockParser(object):
     def _code_block(self) -> DOM:
         """
         CodeBlock
-            : INDENT_LINE CodeBlock
-            | INDENT_LINE
-            | None
+            : CodeBlock IndentLine
+            | IndentLine
             ;
         """
-        contents: str = self._eat("INDENT_LINE")["value"].strip()
+        contents: list[DOM | str] = [DOM('code', children=[self._indent_line()])]
+        while self._lookahead["type"] == "INDENT":
+            contents.append(DOM('code', children=[self._indent_line()]))
 
-        while self._lookahead["type"] == "INDENT_LINE":
-            contents += f"\n{self._eat('INDENT_LINE')['value'].strip()}"
+        return DOM('pre', children=contents)
 
-        return DOM('pre', children=[DOM('code', children=[contents])])
+    def _indent_line(self) -> str:
+        """
+        IndentLine
+            : INDENT LINE
+            ;
+
+        LINE = the rest of the line it will not be analyzed as a token
+        """
+        self._eat("INDENT")
+        return self._eat_rest_of_line()
 
     def _atx_header(self) -> DOM:
         """
@@ -114,7 +133,7 @@ class BlockParser(object):
         """
         Paragraph
             : TEXT_LINE Paragraph
-            | INDENT_LINE Paragraph
+            | ParagraphContinuationLine
             | None
             ;
         """
@@ -122,13 +141,26 @@ class BlockParser(object):
 
         while (
             self._lookahead["type"] == "TEXT_LINE" 
-            or self._lookahead["type"] == "INDENT_LINE"
+            or self._lookahead["type"] == "INDENT"
                 ):
             # we append the stripped contents of this line to the paragraph
             # contents and consume the token
-            contents += f"\n{self._eat(self._lookahead['type'])['value'].strip()}"
+            contents += f"\n{self._p_continuation_line().strip()}"
 
         return DOM('p', children=[contents])
+
+    def _p_continuation_line(self) -> str:
+        """
+        ParagraphContinuationLine
+            : TEXT_LINE
+            | IndentLine
+            ;
+        """
+        if self._lookahead["type"] == "TEXT_LINE":
+            return self._eat("TEXT_LINE")["value"]
+        else:
+            return self._indent_line()
+        
 
 class InlineParser(object):
     def parse(self, dom: DOM):
