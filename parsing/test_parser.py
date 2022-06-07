@@ -82,7 +82,7 @@ this is a paragraph followed by a header
     x = a + b
 This is a paragraph
         """
-        expected: str = "<html><pre><code>this is a code block\nthis is another part of code\nx = a + b</code></pre><p>This is a paragraph</p></html>"
+        expected: str = "<html><pre><code>this is a code block</code><code>this is another part of code</code><code>x = a + b</code></pre><p>This is a paragraph</p></html>"
         self.run_test(markdown, expected)
 
 
