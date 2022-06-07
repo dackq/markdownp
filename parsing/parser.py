@@ -76,7 +76,7 @@ class BlockParser(object):
             return
         if self._lookahead["type"] == "ATX_HEADER":
             return self._atx_header()
-        if self._lookahead["type"] == "INDENT_LINE":
+        if self._lookahead["type"] == "INDENT":
             return self._code_block()
 
         # otherwise treat as a paragraph
@@ -85,17 +85,26 @@ class BlockParser(object):
     def _code_block(self) -> DOM:
         """
         CodeBlock
-            : INDENT_LINE CodeBlock
-            | INDENT_LINE
-            | None
+            : CodeBlock IndentLine
+            | IndentLine
             ;
         """
-        contents: str = self._eat("INDENT_LINE")["value"].strip()
+        contents: list[DOM | str] = [DOM('code', children=[self._indent_line()])]
+        while self._lookahead["type"] == "INDENT":
+            contents.append(DOM('code', children=[self._indent_line()]))
 
-        while self._lookahead["type"] == "INDENT_LINE":
-            contents += f"\n{self._eat('INDENT_LINE')['value'].strip()}"
+        return DOM('pre', children=contents)
 
-        return DOM('pre', children=[DOM('code', children=[contents])])
+    def _indent_line(self) -> str:
+        """
+        IndentLine
+            : INDENT LINE
+            ;
+
+        LINE = the rest of the line it will not be analyzed as a token
+        """
+        self._eat("INDENT")
+        return self._eat_rest_of_line()
 
     def _atx_header(self) -> DOM:
         """
