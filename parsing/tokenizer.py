@@ -6,7 +6,7 @@ import re
 
 block_spec: tuple[tuple[str, str], ...] = (
     # indent
-    ('( {4}|\\t)', 'INDENT'),
+    (' {4}|\\t', 'INDENT'),
 
     # list lines
     # unordered
@@ -16,7 +16,7 @@ block_spec: tuple[tuple[str, str], ...] = (
     (' *\\d+\\. .*', 'OL_LINE'),
 
     # headers
-    (' *(#{1,6} .+)', 'ATX_HEADER'),
+    ('#{1,6} .+', 'ATX_HEADER'),
 )
 
 class BlockTokenizer(object):
@@ -38,7 +38,7 @@ class BlockTokenizer(object):
         # if there was a match then advance the cursor
         self._cursor += len(matched.group())
 
-        return matched.group(1)
+        return matched.group()
 
     def get_rest_of_line(self) -> str:
         """
