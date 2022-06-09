@@ -68,6 +68,7 @@ class BlockParser(object):
         Element
             :   AtxHeader
             |   Paragraph
+            |   CodeBlock
             ;
         """
         if self._lookahead["type"] == "BLANK_LINE":

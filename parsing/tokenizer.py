@@ -36,7 +36,7 @@ class BlockTokenizer(object):
             return None
         
         # if there was a match then advance the cursor
-        self._cursor = len(matched.group())
+        self._cursor += len(matched.group())
 
         return matched.group(1)
 
@@ -48,7 +48,7 @@ class BlockTokenizer(object):
         This is used when a specific structure ignores the token value of a line 
         and just returns a string of plane text. (For example, in a code block)
         """
-        line: str = self._current_line[self._cursor:]
+        line: str = self._current_line[self._cursor:-1] # skip the new line at the end
         self._cursor = len(self._current_line)
         return line
 
@@ -82,12 +82,16 @@ class BlockTokenizer(object):
 
             # if there is a match then return it
             if token != None:
-                if ( pattern[1] == 'INDENT'
-                    or pattern[1] == 'BLOCK'):
-                    # no need for value if line is blank
+                if pattern[1] == 'INDENT':
                     return {
-                        "type": pattern[1]
+                        "type": pattern[1], 
+                        "value": "\t"
                     }
+                elif pattern[1] == 'BLOCK':
+                    return {
+                        "type": pattern[1],
+                        "value": ""
+                        }
                 return {
                     "type": pattern[1],
                     "value": token.strip()
