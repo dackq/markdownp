@@ -55,13 +55,29 @@ class BlockTokenizerTests(TestCase):
         self.run_test(text, expected, tokenizer_type='block')
 
     def test_indent(self):
-        text: str = "    indented line"
+        text: str = "\tindented line"
         expected: tuple[dict[str, str], ...] = (
                 {"type": "INDENT", "value": "\t"},
                 {"type": "TEXT_LINE", "value": "indented line"}
         )
         self.run_test(text, expected, tokenizer_type='block')
 
+        # double indent
+        text: str = "\t\tindented line"
+        expected: tuple[dict[str, str], ...] = (
+                {"type": "INDENT", "value": "\t"},
+                {"type": "INDENT", "value": "\t"},
+                {"type": "TEXT_LINE", "value": "indented line"}
+        )
+        self.run_test(text, expected, tokenizer_type='block')
+
+        # indent followed by whitespace (less than 4 spaces)
+        text: str = "\t indented line"
+        expected: tuple[dict[str, str], ...] = (
+                {"type": "INDENT", "value": "\t"},
+                {"type": "TEXT_LINE", "value": "indented line"}
+        )
+        self.run_test(text, expected, tokenizer_type='block')
 
     def test_text_line(self):
         text: str = "hello there"
@@ -87,6 +103,13 @@ class BlockTokenizerTests(TestCase):
         expected: tuple[dict[str, str], ...] = (
                 {"type": "TEXT_LINE", "value": "#hello there"},
                 {"type": "TEXT_LINE", "value": "Tortoise"},
+        )
+        self.run_test(text, expected, tokenizer_type='block')
+
+        # line that starts with only three spaces
+        text: str = "   hello there\n"
+        expected: tuple[dict[str, str], ...] = (
+                {"type": "TEXT_LINE", "value": "hello there"},
         )
         self.run_test(text, expected, tokenizer_type='block')
 

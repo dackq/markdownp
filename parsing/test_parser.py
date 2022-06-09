@@ -39,7 +39,7 @@ this is a paragraph
         self.run_test(markdown, expected)
 
         markdown: str = "this is a paragraph\twith an indent in the middle"
-        expected: str = "<html><p>this is a paragraph\twith an indent in the middle</p></html>"
+        expected: str = "<html><p>this is a paragraph    with an indent in the middle</p></html>"
         self.run_test(markdown, expected)
 
     def test_atx_header(self):
