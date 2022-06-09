@@ -36,7 +36,7 @@ class BlockTokenizer(object):
             return None
         
         # if there was a match then advance the cursor
-        self._cursor = len(matched.group())
+        self._cursor += len(matched.group())
 
         return matched.group(1)
 
