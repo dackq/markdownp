@@ -48,7 +48,7 @@ class BlockTokenizer(object):
         This is used when a specific structure ignores the token value of a line 
         and just returns a string of plane text. (For example, in a code block)
         """
-        line: str = self._current_line[self._cursor:]
+        line: str = self._current_line[self._cursor:-1] # skip the new line at the end
         self._cursor = len(self._current_line)
         return line
 
