@@ -5,12 +5,11 @@ from io import TextIOBase
 import re
 
 block_spec: tuple[tuple[str, str], ...] = (
-    # indent
-    ('( {4}|\\t)', 'INDENT'),
+    # indent (four spaces)
+    ('( {4})', 'INDENT'),
 
-    # list lines
-    # unordered
-    (' *[-*] .*', 'UL_LINE'),
+    # whitespace (any amount of spaces less than four (INDENT))
+    ('( *)', 'WHITESPACE'),
 
     # ordered
     (' *\\d+\\. .*', 'OL_LINE'),
@@ -76,13 +75,20 @@ class BlockTokenizer(object):
                 self._cursor = len(self._current_line)
                 return { "type": "BLANK_LINE" }
 
+            # replace all \t with four spaces
+            self._current_line = self._current_line.replace('\t', '    ')
+
         # try to match with each pattern in block_spec
         for pattern in block_spec:
             token: str | None = self._match_line(pattern[0], self._current_line)
 
             # if there is a match then return it
             if token != None:
-                if pattern[1] == 'INDENT':
+                # special case tokens
+                if pattern[1] == 'WHITESPACE':
+                    # skip whitespace
+                    continue
+                elif pattern[1] == 'INDENT':
                     return {
                         "type": pattern[1], 
                         "value": "\t"
@@ -92,6 +98,8 @@ class BlockTokenizer(object):
                         "type": pattern[1],
                         "value": ""
                         }
+
+                # all other token types are returned here
                 return {
                     "type": pattern[1],
                     "value": token.strip()
@@ -99,11 +107,11 @@ class BlockTokenizer(object):
 
         # if the line does not match any pattern then we just return a normal
         # text line
-        # advance the cursor
         text_line = {
                 "type": "TEXT_LINE",
                 "value": self._current_line[self._cursor:].strip()
         }
 
+        # and advance the cursor
         self._cursor = len(self._current_line)
         return text_line
