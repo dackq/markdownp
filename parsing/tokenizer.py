@@ -82,12 +82,16 @@ class BlockTokenizer(object):
 
             # if there is a match then return it
             if token != None:
-                if ( pattern[1] == 'INDENT'
-                    or pattern[1] == 'BLOCK'):
-                    # no need for value if line is blank
+                if pattern[1] == 'INDENT':
                     return {
-                        "type": pattern[1]
+                        "type": pattern[1], 
+                        "value": "\t"
                     }
+                elif pattern[1] == 'BLOCK':
+                    return {
+                        "type": pattern[1],
+                        "value": ""
+                        }
                 return {
                     "type": pattern[1],
                     "value": token.strip()
