@@ -38,6 +38,9 @@ this is a paragraph
         expected: str = "<html><p>this is a paragraph\nwith an indented line after it</p></html>"
         self.run_test(markdown, expected)
 
+        markdown: str = "this is a paragraph\twith an indent in the middle"
+        expected: str = "<html><p>this is a paragraph\twith an indent in the middle</p></html>"
+        self.run_test(markdown, expected)
 
     def test_atx_header(self):
         markdown: str = """
@@ -79,10 +82,10 @@ this is a paragraph followed by a header
         markdown: str = """
     this is a code block
     this is another part of code 
-    x = a + b
+        x = a + b
 This is a paragraph
         """
-        expected: str = "<html><pre><code>this is a code block\nthis is another part of code\nx = a + b</code></pre><p>This is a paragraph</p></html>"
+        expected: str = "<html><pre><code>this is a code block</code><code>this is another part of code</code><code>\tx = a + b</code></pre><p>This is a paragraph</p></html>"
         self.run_test(markdown, expected)
 
 
