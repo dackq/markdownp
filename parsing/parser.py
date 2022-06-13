@@ -5,6 +5,7 @@ from io import TextIOBase
 from dom.renderer import DOM
 from parsing.tokenizer import BlockTokenizer
 import re
+from typing import Union
 
 class Parser(object):
     def parse(self, path: str) -> DOM:
@@ -19,6 +20,7 @@ class BlockParser(object):
     def parse(self, file: TextIOBase) -> DOM:
         self._tokenizer = BlockTokenizer(file)
         self._lookahead = self._tokenizer.get_next_token()
+        self._open_block_stack: list[DOM] = []
 
         return self._html()
 
@@ -44,10 +46,43 @@ class BlockParser(object):
         line: str = self._lookahead["value"] + self._tokenizer.get_rest_of_line()
         self._lookahead = self._tokenizer.get_next_token()
         return line
+
+    def _write_to_current_open_block(self, *items: Union['DOM', str]):
+        """
+        Writes the provided items to the children of the top element in the 
+        open_block_stack.
+        """
+        self._open_block_stack[-1].children.extend(items)
+
+    def _open_block(self, block_type: str):
+        """
+        Pushes given block to the open block stack and updates the current block
+        pointer.
+        """
+        self._open_block_stack.append(DOM(block_type))
+
+    def _close_block(self) -> DOM:
+        """
+        Pops the current block off of the stack and returns it
+        """
+        return self._open_block_stack.pop()
     
     def _html(self) -> DOM:
-        return DOM('html', children=self._element_list())
-        
+        self._open_block('html')
+        self._write_to_current_open_block(self._body())
+        return self._close_block()
+
+    def _body(self) -> DOM:
+        """
+        Body
+            : ElementList
+            ;
+        """
+        self._open_block('body')
+        self._write_to_current_open_block(*self._element_list())
+        return self._close_block()
+
+
     def _element_list(self) -> list[DOM | str]:
         """
         ElementList:
@@ -90,11 +125,13 @@ class BlockParser(object):
             | IndentLine
             ;
         """
-        contents: list[DOM | str] = [DOM('code', children=[self._indent_line()])]
+        self._open_block('pre')
+        self._open_block('code')
+        self._write_to_current_open_block(self._indent_line())
         while self._lookahead["type"] == "INDENT":
-            contents.append(DOM('code', children=[self._indent_line()]))
-
-        return DOM('pre', children=contents)
+            self._write_to_current_open_block('\n'+self._indent_line())
+        self._write_to_current_open_block(self._close_block())
+        return self._close_block()
 
     def _indent_line(self) -> str:
         """
@@ -138,7 +175,8 @@ class BlockParser(object):
             | None
             ;
         """
-        contents: str = self._eat("TEXT_LINE")["value"]
+        self._open_block('p')
+        self._write_to_current_open_block(self._eat("TEXT_LINE")["value"])
 
         while (
             self._lookahead["type"] == "TEXT_LINE" 
@@ -146,9 +184,9 @@ class BlockParser(object):
                 ):
             # we append the stripped contents of this line to the paragraph
             # contents and consume the token
-            contents += f"\n{self._p_continuation_line().strip()}"
+            self._write_to_current_open_block(f"\n{self._p_continuation_line().strip()}")
 
-        return DOM('p', children=[contents])
+        return self._close_block()
 
     def _p_continuation_line(self) -> str:
         """
