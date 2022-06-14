@@ -3,7 +3,6 @@ Tests for the markdownp parser module
 """
 
 import unittest
-from textwrap import dedent
 from dom.renderer import render, DOM
 from parsing.parser import BlockParser
 from io import StringIO
