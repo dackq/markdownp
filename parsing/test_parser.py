@@ -8,7 +8,7 @@ from parsing.parser import BlockParser
 from io import StringIO
 
 class ParserTests(unittest.TestCase):
-    def run_test(self, markdown, expected_dom):
+    def run_test(self, markdown: str, expected_dom: str):
         parser: BlockParser = BlockParser()
         stream: StringIO = StringIO(markdown)
 
