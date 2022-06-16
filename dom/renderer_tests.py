@@ -2,10 +2,11 @@ import unittest
 
 from renderer import DOM, render
 
+
 class Tests(unittest.TestCase):
     def setup(self):
         pass
-    
+
     def test_paragraph(self):
         paragraph: DOM = DOM("p", children=["Hello there"])
 
@@ -23,7 +24,7 @@ class Tests(unittest.TestCase):
         expected = "<html><p>Hello there</p><p>Hello there</p></html>"
 
         self.assertEquals(actual, expected)
-        
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
