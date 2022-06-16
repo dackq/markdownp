@@ -7,6 +7,7 @@ from dom.renderer import render, DOM
 from parsing.parser import BlockParser
 from io import StringIO
 
+
 class ParserTests(unittest.TestCase):
     def run_test(self, markdown: str, expected_dom: str):
         parser: BlockParser = BlockParser()
@@ -16,7 +17,6 @@ class ParserTests(unittest.TestCase):
         html = render(parsed_dom)
 
         self.assertEqual(html, expected_dom)
-
 
     def test_paragraph(self):
         markdown: str = """
@@ -88,5 +88,5 @@ This is a paragraph
         self.run_test(markdown, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

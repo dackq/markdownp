@@ -17,26 +17,26 @@ options:
 
 from argparse import ArgumentParser, Namespace
 
+
 def parse_args(args: list[str]) -> Namespace:
-    parser: ArgumentParser = ArgumentParser(
-            description="A simple markdown parser."
-            )
+    parser: ArgumentParser = ArgumentParser(description="A simple markdown parser.")
 
     # arguments
-    parser.add_argument("file",
-            help="The path to the file to be parsed", 
-            metavar="<file>"
-            )
+    parser.add_argument(
+        "file", help="The path to the file to be parsed", metavar="<file>"
+    )
 
     # options
-    parser.add_argument("--verbose", "-v",
-            help="Enable verbose mode.",
-            action="store_true"
-            )
+    parser.add_argument(
+        "--verbose", "-v", help="Enable verbose mode.", action="store_true"
+    )
 
-    parser.add_argument("--output", "-o",
-            help="File to output the html to",
-            type=str,
-            default="output.html")
+    parser.add_argument(
+        "--output",
+        "-o",
+        help="File to output the html to",
+        type=str,
+        default="output.html",
+    )
 
     return parser.parse_args(args)
