@@ -8,10 +8,9 @@ from dom.renderer import render, DOM
 from argparse import Namespace
 from sys import argv
 
-
 def main():
     args: Namespace = cli.parse_args(argv[1:])
-
+    
     # setup parsers and renders
     parser: Parser = Parser()
 
@@ -22,7 +21,6 @@ def main():
     # write markdown to new file
     with open(args.output, "w") as output:
         output.write(html)
-
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,6 @@ from parsing.tokenizer import BlockTokenizer
 import re
 from typing import Union
 
-
 class Parser(object):
     def parse(self, path: str) -> DOM:
         with open(path) as file:
@@ -17,7 +16,6 @@ class Parser(object):
             dom = inline_parser.parse(dom)
             return dom
 
-
 class BlockParser(object):
     def parse(self, file: TextIOBase) -> DOM:
         self._tokenizer = BlockTokenizer(file)
@@ -26,7 +24,7 @@ class BlockParser(object):
 
         return self._html()
 
-    def _eat(self, expected_type: str) -> dict[str, str]:
+    def _eat(self, expected_type: str) -> dict[str,str]:
         """
         Consume the lookahead and set the lookahead to the next token
         """
@@ -35,9 +33,8 @@ class BlockParser(object):
             self._lookahead = self._tokenizer.get_next_token()
             return old_token
 
-        raise SyntaxError(
-            f"Received unexpected line {self._lookahead}, " f"expected {expected_type}"
-        )
+        raise SyntaxError(f"Received unexpected line {self._lookahead}, "
+                f"expected {expected_type}")
 
     def _eat_rest_of_line(self) -> str:
         """
@@ -50,9 +47,9 @@ class BlockParser(object):
         self._lookahead = self._tokenizer.get_next_token()
         return line
 
-    def _write_to_current_open_block(self, *items: Union["DOM", str]):
+    def _write_to_current_open_block(self, *items: Union['DOM', str]):
         """
-        Writes the provided items to the children of the top element in the
+        Writes the provided items to the children of the top element in the 
         open_block_stack.
         """
         self._open_block_stack[-1].children.extend(items)
@@ -69,9 +66,9 @@ class BlockParser(object):
         Pops the current block off of the stack and returns it
         """
         return self._open_block_stack.pop()
-
+    
     def _html(self) -> DOM:
-        self._open_block("html")
+        self._open_block('html')
         self._write_to_current_open_block(self._body())
         return self._close_block()
 
@@ -81,9 +78,10 @@ class BlockParser(object):
             : ElementList
             ;
         """
-        self._open_block("body")
+        self._open_block('body')
         self._write_to_current_open_block(*self._element_list())
         return self._close_block()
+
 
     def _element_list(self) -> list[DOM | str]:
         """
@@ -127,11 +125,11 @@ class BlockParser(object):
             | IndentLine
             ;
         """
-        self._open_block("pre")
-        self._open_block("code")
+        self._open_block('pre')
+        self._open_block('code')
         self._write_to_current_open_block(self._indent_line())
         while self._lookahead["type"] == "INDENT":
-            self._write_to_current_open_block("\n" + self._indent_line())
+            self._write_to_current_open_block('\n'+self._indent_line())
         self._write_to_current_open_block(self._close_block())
         return self._close_block()
 
@@ -153,8 +151,8 @@ class BlockParser(object):
             ;
         """
 
-        header: str = self._eat("ATX_HEADER")["value"]
-
+        header:str = self._eat("ATX_HEADER")["value"]
+        
         # we need to figure out how many '#'s there are
         matched: re.Match[str] | None = re.match("#{1,6}", header)
         if matched:
@@ -162,11 +160,9 @@ class BlockParser(object):
 
             return DOM(f"h{header_level}", children=[header.strip(" \t#")])
 
-        raise SyntaxError(
-            f"Incorrect header format. Received {header}, "
-            "expected 1-6 # characters leading"
-        )
-
+        raise SyntaxError(f"Incorrect header format. Received {header}, "
+                "expected 1-6 # characters leading")
+        
     def _paragraph(self) -> DOM:
         # paragraph should end if it is followed by anything other than
         # TEXT_LINE, INDENT_LINE,  but it can have multiple of them.
@@ -179,18 +175,16 @@ class BlockParser(object):
             | None
             ;
         """
-        self._open_block("p")
+        self._open_block('p')
         self._write_to_current_open_block(self._eat("TEXT_LINE")["value"])
 
         while (
-            self._lookahead["type"] == "TEXT_LINE"
+            self._lookahead["type"] == "TEXT_LINE" 
             or self._lookahead["type"] == "INDENT"
-        ):
+                ):
             # we append the stripped contents of this line to the paragraph
             # contents and consume the token
-            self._write_to_current_open_block(
-                f"\n{self._p_continuation_line().strip()}"
-            )
+            self._write_to_current_open_block(f"\n{self._p_continuation_line().strip()}")
 
         return self._close_block()
 
@@ -205,7 +199,7 @@ class BlockParser(object):
             return self._eat("TEXT_LINE")["value"]
         else:
             return self._indent_line()
-
+        
 
 class InlineParser(object):
     def parse(self, dom: DOM):
